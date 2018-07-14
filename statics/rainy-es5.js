@@ -20,20 +20,23 @@ var Drop = function Drop() {
 
     this.length = getRandomInt(5, 100);
     this.currentPosition = {
-        x: getRandomInt(0, window.innerWidth),
+        x: getRandomInt(0, 2000),
         y: -this.length - getRandomInt(0, 200)
     };
     this.color = ["lightblue", "#67C5DE", "#6196cc"].choose();
     this.width = getRandomInt(1, 3);
-    this.speed = getRandomInt(1, 4);
+    this.speed = getRandomInt(1, 3);
     this.accelerateRate = 0.02;
 };
 
 var Rain = {
+    state: {
+        isFocus: true
+    },
     config: {
         CANVAS_SIZE: {
-            X: 1500,
-            Y: 1500
+            X: 3000,
+            Y: 2000
         },
         NEW_DROPS_NUMBER: 25
         //DELETE_HEIGHT: 1000,
@@ -52,7 +55,12 @@ var Rain = {
         });
         //console.log('drops.length : ' + this.drops.length)
     },
-    update: function update() {
+    updateDrop: function updateDrop(drop) {
+
+        drop.speed += drop.accelerateRate;
+        drop.currentPosition.y += drop.speed;
+    },
+    updateDrops: function updateDrops() {
         var _this2 = this;
 
         //console.log(this.drops);
@@ -65,16 +73,11 @@ var Rain = {
         ctx.fillStyle = drop.color;
         ctx.fillRect(drop.currentPosition.x, drop.currentPosition.y, drop.width, drop.length);
     },
-    updateDrop: function updateDrop(drop) {
-
-        drop.speed += drop.accelerateRate;
-        drop.currentPosition.y += drop.speed; // * (1 + acc)
-    },
-    redraw: function redraw() {
+    drawDrops: function drawDrops() {
         var _this3 = this;
 
         this.drops = this.drops.filter(function (d) {
-            return d.currentPosition.y < window.innerHeight; //this.config.DELETE_HEIGHT
+            return d.currentPosition.y < 2000; //window.innerHeight//this.config.DELETE_HEIGHT
         });
         this.drops.map(function (drop) {
             return _this3.drawDrop(drop);
@@ -85,21 +88,36 @@ var Rain = {
 
         this.createDrops();
         window.setInterval(function () {
-            return _this4.createDrops();
+            if (_this4.state.isFocus) {
+                _this4.createDrops();
+            }
         }, 1000);
         this.loop();
+        window.onfocus = function () {
+            //console.log('started');
+            _this4.state.isFocus = true;
+            _this4.loop();
+        };
+        window.onblur = function () {
+            _this4.state.isFocus = false;
+        };
     },
     loop: function loop() {
         var _this5 = this;
 
-        ctx.clearRect(0, 0, this.config.CANVAS_SIZE.X, this.config.CANVAS_SIZE.Y);
-        ctx.save();
-        this.update();
-        this.redraw();
-        ctx.restore();
-        window.requestAnimationFrame(function () {
-            return _this5.loop();
-        });
+        if (this.state.isFocus) {
+            ctx.clearRect(0, 0, 2000, 2000);
+            ctx.save();
+            this.updateDrops();
+            this.drawDrops();
+            ctx.restore();
+            window.requestAnimationFrame(function () {
+                return _this5.loop();
+            });
+        }
+        //else {
+        //console.log('stoped')
+        //}
     }
 };
 
