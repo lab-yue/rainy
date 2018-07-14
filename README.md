@@ -1,8 +1,8 @@
 # rainy
----
+
 ### canvas rainy effect
 
-Inspired by this [codepen demo](https://codepen.io/Eslam-Yahya/pen/MvKZKj)
+Inspired by this [codepen demo](https://codepen.io/Eslam-Yahya/pen/MvKZKj) (svg)
 
 Screenshot:
 
